@@ -1,0 +1,83 @@
+unit Unit1;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, DBCtrls, Grids, DBGrids, ADODB, DB, Vcl.StdCtrls, acPNG,
+  Vcl.Mask, Vcl.Samples.Spin, Vcl.Buttons;
+
+type
+  TForm1 = class(TForm)
+    DataSource1: TDataSource;
+    ADOConnection1: TADOConnection;
+    ADODataSet1: TADODataSet;
+    ADOQuery1: TADOQuery;
+    DBGrid1: TDBGrid;
+    DBNavigator1: TDBNavigator;
+    DBGrid2: TDBGrid;
+    DataSource2: TDataSource;
+    ADOQuery2: TADOQuery;
+    Image1: TImage;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Edit1: TEdit;
+    procedure DBGrid1CellClick(Column: TColumn);
+    procedure Label1DblClick(Sender: TObject);
+    procedure Edit1DblClick(Sender: TObject);
+    procedure Edit1KeyPress(Sender: TObject; var Key: Char);
+
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.dfm}
+
+
+
+procedure TForm1.DBGrid1CellClick(Column: TColumn);
+begin
+   Label3.Caption:='Склад № : '+ dbgrid1.Fields[0].AsString;
+Label1.Caption:='Количество мест: '+ dbgrid2.Fields[4].AsString;
+
+end;
+
+procedure TForm1.Edit1DblClick(Sender: TObject);
+var i:integer;
+begin
+edit1.Visible:=false;
+i:=10;
+  if Application.MessageBox('Изменить?',' ',MB_YESNO)=IDYES then  begin
+  if edit1.Text <> ''  then begin
+  edit1.Text:= inttostr(strtoint(edit1.Text)+i); end;
+   Label1.Caption:= 'Количество мест: '+ edit1.Text;
+    ADOQuery1.Edit;
+ADOQuery1.FieldByName('Места').AsString:=Edit1.Text;
+Adoquery1.Post;  edit1.Visible:=false;  end else exit;
+end;
+
+procedure TForm1.Edit1KeyPress(Sender: TObject; var Key: Char);
+begin
+if Key = #13 then begin
+edit1.Visible:=false;
+      if Application.MessageBox('Изменить?',' ',MB_YESNO)=IDYES then  begin
+     Label1.Caption:= 'Мест всего: '+ edit1.Text;
+    ADOQuery1.Edit;
+ADOQuery1.FieldByName('Места').AsString:=Edit1.Text;
+Adoquery1.Post;  edit1.Visible:=false;  end else exit;
+end;    end;
+
+procedure TForm1.Label1DblClick(Sender: TObject);
+begin
+edit1.visible:=true;
+end;
+
+end.

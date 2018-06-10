@@ -1,0 +1,185 @@
+unit Unit1;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, DBCtrls, Grids, DBGrids, ADODB, DB, Vcl.StdCtrls, acPNG,
+  Vcl.Mask, Vcl.Samples.Spin, Vcl.Buttons, Vcl.ComCtrls;
+
+type
+  TForm1 = class(TForm)
+    DataSource1: TDataSource;
+    ADOConnection1: TADOConnection;
+    ADODataSet1: TADODataSet;
+    ADOQuery1: TADOQuery;
+    DBNavigator1: TDBNavigator;
+    DBGrid2: TDBGrid;
+    DataSource2: TDataSource;
+    ADOQuery2: TADOQuery;
+    Image1: TImage;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Edit1: TEdit;
+    GroupBox1: TGroupBox;
+    Edit2: TEdit;
+    Edit5: TLabeledEdit;
+    Edit4: TEdit;
+    Button1: TButton;
+    Label4: TLabel;
+    DateTimePicker1: TDateTimePicker;
+    Edit3: TEdit;
+    DataSource3: TDataSource;
+    ADOQuery3: TADOQuery;
+    Button2: TButton;
+    DBGrid3: TDBGrid;
+    DBGrid1: TDBGrid;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Button3: TButton;
+    Button4: TButton;
+    DataSource4: TDataSource;
+    ADOQuery4: TADOQuery;
+    DBGrid4: TDBGrid;
+    procedure DBGrid1CellClick(Column: TColumn);
+    procedure Label1DblClick(Sender: TObject);
+    procedure Edit1DblClick(Sender: TObject);
+    procedure Edit1KeyPress(Sender: TObject; var Key: Char);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
+    procedure DBGrid4CellClick(Column: TColumn);
+
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.dfm}
+
+
+
+procedure TForm1.Button1Click(Sender: TObject);
+var kolvo, mest, itog: integer;
+begin
+       Button2.Click ;
+begin
+ADOQuery2.Insert;
+ADOQuery2.FieldByName('Наименование продукции').AsString:=Edit2.Text;
+ADOQuery2.FieldByName('Цена').AsInteger:=StrToInt(Edit5.Text);
+ ADOQuery2.FieldByName('КоличествоМест').AsInteger:=StrToInt(Edit4.Text);
+ADOQuery2.FieldByName('НомерСклада').AsInteger:=StrToInt(Edit3.Text);
+ ADOQuery2.FieldByName('Дата').AsDateTime:=DateTimePicker1.DateTime;
+
+ end;
+
+
+   showmessage('Продукт добавлен');
+end;
+
+procedure TForm1.Button2Click(Sender: TObject);
+var kolvo, mest, itog: integer;
+const
+  s1: string = 'Select `Места(свободно)` FROM Склад WHERE Id_склада=';
+begin
+ ADOQuery3.Active := False;
+  ADOQuery3.SQL.Clear;
+  ADOQuery3.SQL.Text := 'Select `Места(свободно)` FROM Склад WHERE Id_склада=' + Edit3.Text;
+  ADOQuery3.Active := True;
+       kolvo:= StrToInt(Edit4.Text);
+   //  edit6.Text:=  dbgrid3.Fields[0].AsString;
+     mest:= dbgrid3.Fields[0].AsInteger; //  strtoint(edit6.Text);
+    itog:= mest - kolvo;
+   // edit6.Text:= inttostr(mest);
+  //  edit7.Text:=  inttostr(kolvo);
+  //   edit8.Text:=  inttostr(itog);
+     //    showmessage(inttostr(mest));
+         ADOQuery3.Edit;
+          ADOQuery3.FieldByName('Места(свободно)').AsInteger:= itog;
+Adoquery3.Post;
+
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+begin
+  DBGrid4.visible:=false;
+     DBGrid1.visible:=true;
+  DBGrid1.DataSource := DataSource1;
+  DBNavigator1.DataSource := DataSource1;
+  //  Label3.visible:=true;    Label4.visible:=true;  Label1.visible:=true;
+end;
+
+procedure TForm1.Button4Click(Sender: TObject);
+begin
+     DBGrid1.visible:=false;
+     DBGrid4.visible:=true;
+  DBNavigator1.DataSource := DataSource4;
+ // Label3.visible:=false;     Label4.visible:=false;   Label1.visible:=false;
+end;
+
+procedure TForm1.DBGrid1CellClick(Column: TColumn);
+begin
+if (DBGrid1.DataSource=DataSource1) then  begin
+   Label3.Caption:='Склад № : '+ dbgrid1.Fields[0].AsString;
+Label1.Caption:='Количество мест: '+ dbgrid1.Fields[3].AsString;
+    Label4.Caption:='Свободных мест: '+ dbgrid1.Fields[4].AsString;
+    if DBGrid1.DataSource=DataSource4 then  begin
+           Label3.Caption:='Склад № : '+ dbgrid1.Fields[5].AsString;
+Label1.Caption:='Количество мест: '+ dbgrid1.Fields[1].AsString;
+
+
+
+
+    end;
+end;
+
+
+end;
+
+procedure TForm1.DBGrid4CellClick(Column: TColumn);
+begin
+ Label4.Caption:= dbgrid4.Fields[1].AsString;
+           Label3.Caption:='Склад № : '+ dbgrid4.Fields[4].AsString;
+Label1.Caption:='Занимаемых мест: '+ dbgrid4.Fields[3].AsString;
+end;
+
+procedure TForm1.Edit1DblClick(Sender: TObject);
+var i:integer;
+begin
+edit1.Visible:=false;
+i:=10;
+  if Application.MessageBox('Изменить?',' ',MB_YESNO)=IDYES then  begin
+  if edit1.Text <> ''  then begin
+  edit1.Text:= inttostr(strtoint(edit1.Text)+i); end;
+   Label1.Caption:= 'Количество мест: '+ edit1.Text;
+    ADOQuery1.Edit;
+ADOQuery1.FieldByName('Места').AsString:=Edit1.Text;
+Adoquery1.Post;  edit1.Visible:=false;  end else exit;
+end;
+
+procedure TForm1.Edit1KeyPress(Sender: TObject; var Key: Char);
+begin
+if Key = #13 then begin
+edit1.Visible:=false;
+      if Application.MessageBox('Изменить?',' ',MB_YESNO)=IDYES then  begin
+     Label1.Caption:= 'Мест всего: '+ edit1.Text;
+    ADOQuery1.Edit;
+ADOQuery1.FieldByName('Места').AsString:=Edit1.Text;
+Adoquery1.Post;  edit1.Visible:=false;  end else exit;
+end;    end;
+
+procedure TForm1.Label1DblClick(Sender: TObject);
+begin
+edit1.visible:=true;
+end;
+
+end.
